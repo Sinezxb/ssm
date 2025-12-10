@@ -318,7 +318,50 @@ class NormalEnemyPlane(EnemyPlaneBase):
         bullet = EnemyBullet(self.rect.centerx, self.rect.bottom, speed_y=7, speed_x=0, damage=COLLISION_DAMAGE)
         all_sprites.add(bullet)
         enemy_bullets.add(bullet)
+class MLP(nn.Module):
+    def __init__(self, input_dim, hidden_dim, output_dim):
+        super(MLP, self).__init__()
+        self.fc1 = nn.Linear(input_dim, hidden_dim)
+        self.fc2 = nn.Linear(hidden_dim, output_dim)
+        self.relu = nn.ReLU()
+        self.dropout = nn.Dropout(0.1)
 
+    def forward(self, x):
+        x = self.fc1(x)
+        x = self.relu(x)
+        x = self.dropout(x)
+        x = self.fc2(x)
+        return x
+class Selfattention(nn.Module):
+    def __init__(self, embed_dim, num_heads=8, dropout_rate=0.1):
+        super(Selfattention, self).__init__()
+        self.embed_dim = embed_dim
+        self.num_heads = num_heads
+        self.head_dim = embed_dim // num_heads
+
+        assert (
+            self.head_dim * num_heads == embed_dim
+        ), "embed_dim must be divisible by num_heads"
+
+        self.qkv_proj = nn.Linear(embed_dim, embed_dim * 3)
+        self.out_proj = nn.Linear(embed_dim, embed_dim)
+        self.dropout = nn.Dropout(dropout_rate)
+        self.scale = self.head_dim ** -0.5
+    def forward(self, x):
+        batch_size, seq_length, embed_dim = x.size()
+        qkv = self.qkv_proj(x).view(batch_size, seq_length, self.num_heads, 3 * self.head_dim)
+        q, k, v = qkv.chunk(3, dim=-1)
+
+        q = q * self.scale
+        attn_weights = torch.einsum("bshd,bshd->bhs", q, k.transpose(-2, -1))
+        attn_weights = F.softmax(attn_weights, dim=-1)
+        attn_weights = self.dropout(attn_weights)
+
+        attn_output = torch.einsum("bhs,bshd->bshd", attn_weights, v)
+        attn_output = attn_output.reshape(batch_size, seq_length, embed_dim)
+
+        output = self.out_proj(attn_output)
+        return output
 class SmallEnemyPlane(EnemyPlaneBase):
     """小型敌机：体型小，不会发射子弹，速度略快，可能携带护盾或攻击增益"""
     def __init__(self):
