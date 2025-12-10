@@ -55,7 +55,14 @@ class Selfattention(nn.Module):
         out = torch.matmul(attn, value).transpose(1, 2).contiguous().view(batch_size, seq_length, self.num_heads * self.depth)
         out = self.norm(out)
         return out
+class Unet(nn.Module):
+    def __init__(self):
+        super(Unet, self).__init__()
+        # Define Unet layers here
 
+    def forward(self, x):
+        # Define forward pass here
+        return x
 
 class FFT(nn.Module):
     def __init__(self, input_dim, output_dim, num_heads=8, dropout=0.1):
