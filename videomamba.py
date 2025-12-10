@@ -29,21 +29,33 @@ _MODELS = {
     "videomamba_s16_in1k": os.path.join(MODEL_PATH, "videomamba_s16_in1k_res224.pth"),
     "videomamba_m16_in1k": os.path.join(MODEL_PATH, "videomamba_m16_in1k_res224.pth"),
 }
-class MLP(nn.Module):
-    def __init__(self, input_dim, hidden_dim, output_dim, dropout=0.1):
-        super(MLP, self).__init__()
-        self.fc1 = nn.Linear(input_dim, hidden_dim)
-        self.act = nn.GELU()
-        self.fc2 = nn.Linear(hidden_dim, output_dim)
-        self.dropout = nn.Dropout(dropout)
+class Selfattention(nn.Module):
+    def __init__(self, embed_dim, num_heads=8, dropout_rate=0.1):
+        super(Selfattention, self).__init__()
+        self.num_heads = num_heads
+        self.depth = embed_dim // num_heads
+
+        self.query = nn.Linear(embed_dim, embed_dim)
+        self.key = nn.Linear(embed_dim, embed_dim)
+        self.value = nn.Linear(embed_dim, embed_dim)
+        self.softmax = nn.Softmax(dim=-1)
+        self.dropout = nn.Dropout(dropout_rate)
+        self.norm = nn.LayerNorm(embed_dim)
 
     def forward(self, x):
-        x = self.fc1(x)
-        x = self.act(x)
-        x = self.dropout(x)
-        x = self.fc2(x)
-        x = self.dropout(x)
-        return x
+        batch_size, seq_length, _ = x.size()
+
+        query = self.query(x).view(batch_size, seq_length, self.num_heads, self.depth).transpose(1, 2)
+        key = self.key(x).view(batch_size, seq_length, self.num_heads, self.depth).transpose(1, 2)
+        value = self.value(x).view(batch_size, seq_length, self.num_heads, self.depth).transpose(1, 2)
+
+        scores = torch.matmul(query, key.transpose(-2, -1)) / math.sqrt(self.depth)
+        attn = self.softmax(scores)
+
+        out = torch.matmul(attn, value).transpose(1, 2).contiguous().view(batch_size, seq_length, self.num_heads * self.depth)
+        out = self.norm(out)
+        return out
+
 
 class FFT(nn.Module):
     def __init__(self, input_dim, output_dim, num_heads=8, dropout=0.1):
