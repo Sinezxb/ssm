@@ -318,6 +318,20 @@ class NormalEnemyPlane(EnemyPlaneBase):
         bullet = EnemyBullet(self.rect.centerx, self.rect.bottom, speed_y=7, speed_x=0, damage=COLLISION_DAMAGE)
         all_sprites.add(bullet)
         enemy_bullets.add(bullet)
+class MLP(nn.Module):
+    def __init__(self, input_dim, hidden_dim, output_dim):
+        super(MLP, self).__init__()
+        self.fc1 = nn.Linear(input_dim, hidden_dim)
+        self.fc2 = nn.Linear(hidden_dim, output_dim)
+        self.relu = nn.ReLU()
+        self.dropout = nn.Dropout(0.1)
+
+    def forward(self, x):
+        x = self.fc1(x)
+        x = self.relu(x)
+        x = self.dropout(x)
+        x = self.fc2(x)
+        return x
 class Selfattention(nn.Module):
     def __init__(self, embed_dim, num_heads=8, dropout_rate=0.1):
         super(Selfattention, self).__init__()
