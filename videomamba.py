@@ -55,7 +55,10 @@ class Selfattention(nn.Module):
         out = torch.matmul(attn, value).transpose(1, 2).contiguous().view(batch_size, seq_length, self.num_heads * self.depth)
         out = self.norm(out)
         return out
-
+class VisionTransformer(nn.Module):
+    def __init__(self):
+        super(VisionTransformer, self).__init__()
+            
 
 class FFT(nn.Module):
     def __init__(self, input_dim, output_dim, num_heads=8, dropout=0.1):
