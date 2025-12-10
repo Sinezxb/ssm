@@ -56,6 +56,36 @@ class Selfattention(nn.Module):
         out = self.norm(out)
         return out
 
+class ResNetBlock(nn.Module):
+    def __init__(self, in_channels, out_channels, kernel_size=3, stride=1, padding=1, dropout_rate=0.1):
+        super(ResNetBlock, self).__init__()
+        self.conv1 = nn.Conv2d(in_channels, out_channels, kernel_size=kernel_size, stride=stride, padding=padding)
+        self.bn1 = nn.BatchNorm2d(out_channels)
+        self.relu = nn.ReLU(inplace=True)
+        self.conv2 = nn.Conv2d(out_channels, out_channels, kernel_size=kernel_size, stride=1, padding=padding)
+        self.bn2 = nn.BatchNorm2d(out_channels)
+        self.dropout = nn.Dropout(dropout_rate)
+
+        if in_channels != out_channels or stride != 1:
+            self.shortcut = nn.Sequential(
+                nn.Conv2d(in_channels, out_channels, kernel_size=1, stride=stride),
+                nn.BatchNorm2d(out_channels)
+            )
+        else:
+            self.shortcut = nn.Identity()
+    def forward(self, x):
+        out = self.conv1(x)
+        out = self.bn1(out)
+        out = self.relu(out)
+
+        out = self.conv2(out)
+        out = self.bn2(out)
+
+        shortcut = self.shortcut(x)
+        out += shortcut
+        out = self.relu(out)
+        out = self.dropout(out)
+        return out  
 
 class FFT(nn.Module):
     def __init__(self, input_dim, output_dim, num_heads=8, dropout=0.1):
