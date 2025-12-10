@@ -30,6 +30,59 @@ _MODELS = {
     "videomamba_m16_in1k": os.path.join(MODEL_PATH, "videomamba_m16_in1k_res224.pth"),
 }
 
+<<<<<<< HEAD
+=======
+        self.query = nn.Linear(embed_dim, embed_dim)
+        self.key = nn.Linear(embed_dim, embed_dim)
+        self.value = nn.Linear(embed_dim, embed_dim)
+        self.softmax = nn.Softmax(dim=-1)
+        self.dropout = nn.Dropout(dropout_rate)
+        self.norm = nn.LayerNorm(embed_dim)
+
+    def forward(self, x):
+        batch_size, seq_length, _ = x.size()
+
+        query = self.query(x).view(batch_size, seq_length, self.num_heads, self.depth).transpose(1, 2)
+        key = self.key(x).view(batch_size, seq_length, self.num_heads, self.depth).transpose(1, 2)
+        value = self.value(x).view(batch_size, seq_length, self.num_heads, self.depth).transpose(1, 2)
+
+        scores = torch.matmul(query, key.transpose(-2, -1)) / math.sqrt(self.depth)
+        attn = self.softmax(scores)
+
+        out = torch.matmul(attn, value).transpose(1, 2).contiguous().view(batch_size, seq_length, self.num_heads * self.depth)
+        out = self.norm(out)
+        return out
+class VisionTransformer(nn.Module):
+    def __init__(self):
+        super(VisionTransformer, self).__init__()
+            
+
+class FFT(nn.Module):
+    def __init__(self, input_dim, output_dim, num_heads=8, dropout=0.1):
+        super(FFT, self).__init__()
+        self.num_heads = num_heads
+        self.depth = output_dim // num_heads
+
+        self.query = nn.Linear(input_dim, output_dim)
+        self.key = nn.Linear(input_dim, output_dim)
+        self.value = nn.Linear(input_dim, output_dim)
+        self.softmax = nn.Softmax(dim=-1)
+        self.dropout = nn.Dropout(dropout)
+
+    def forward(self, x):
+        batch_size, seq_length, _ = x.size()
+
+        query = self.query(x).view(batch_size, seq_length, self.num_heads, self.depth).transpose(1, 2)
+        key = self.key(x).view(batch_size, seq_length, self.num_heads, self.depth).transpose(1, 2)
+        value = self.value(x).view(batch_size, seq_length, self.num_heads, self.depth).transpose(1, 2)
+
+        scores = torch.matmul(query, key.transpose(-2, -1)) / math.sqrt(self.depth)
+        attn = self.softmax(scores)
+        attn = self.dropout(attn)
+
+        out = torch.matmul(attn, value).transpose(1, 2).contiguous().view(batch_size, seq_length, -1)
+        return out  
+>>>>>>> 67e2ac7b264d1356e8521594003c8b14fa53d0ab
 class VideoFeatureExtractor(nn.Module):
     def __init__(self, embed_dim):
         super(VideoFeatureExtractor, self).__init__()
