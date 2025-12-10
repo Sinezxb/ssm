@@ -45,21 +45,8 @@ class VideoFeatureExtractor(nn.Module):
         x = self.fc(x)
         return x
 
-class AudioFeatureExtractor(nn.Module):
-    def __init__(self, input_dim, embed_dim):
-        super(AudioFeatureExtractor, self).__init__()
-        resnet = (models.resnet50
-                  (pretrained=True))
-        self.feature_extractor = nn.Sequential(*list(resnet.children())[:-2])  # 保持空间维度
-        self.pool = nn.AdaptiveAvgPool2d((1, 1))
-        self.fc = nn.Linear(resnet.fc.in_features, embed_dim)
 
-    def forward(self, x):
-        x = self.feature_extractor(x)
-        x = self.pool(x)  # 通过池化层
-        x = torch.flatten(x, 1)
-        x = self.fc(x)
-        return x
+
 
 class CrossAttention(nn.Module):
     def __init__(self, embed_dim, num_heads=8, dropout_rate=0.1):
