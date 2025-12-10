@@ -1,0 +1,28 @@
+mixed-port: 7890
+allow-lan: false
+external-controller: '127.0.0.1:7194'
+secret: ''
+proxies:
+  - name: 您选错了配置
+    type: socks5
+    server: 127.0.0.1
+    port: "1080"
+  - name: 此配置无节点
+    type: socks5
+    server: 127.0.0.1
+    port: "1080"
+  - name: 请重新导入配置
+    type: socks5
+    server: 127.0.0.1
+    port: "1080"
+proxy-groups:
+  - name: 警告
+    type: select
+    proxies:
+      - 您选错了配置
+      - 此配置无节点
+      - 请重新导入配置
+rules:
+  - DOMAIN-SUFFIX,time.is,DIRECT
+  - MATCH,DIRECT
+ipv6: false

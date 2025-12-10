@@ -1,0 +1,77 @@
+showNewVersionIcon: false
+hideAfterStartup: false
+randomControllerPort: true
+systemTheme: true
+connProxy: 1
+connProfile: true
+connMode: true
+connChainType: 2
+editProfileWithCFWEditor: true
+editor: 0
+mixinText: |
+  mixin: # mixin 添加 win-tap模式 全部内容
+    dns:
+      enable: true
+      enhanced-mode: fake-ip
+      listen: 0.0.0.0:53
+      nameserver:
+        - 119.29.29.29
+        - 223.5.5.5
+      fallback:
+        - tls://1.1.1.1:853
+        - tls://1.0.0.1:853
+        - https://1.1.1.1/dns-query
+        - https://1.0.0.1/dns-query
+        - tls://8.8.8.8:853
+        - tls://8.8.4.4:853
+        - https://8.8.8.8/dns-query
+        - https://8.8.4.4/dns-query
+      fake-ip-filter:
+        - +.*   # 模拟 redir-host
+bypassText: |
+  bypass:
+    - "*.steamchina.com"
+    - "csgo.wmsj.cn"
+    - "dota2.wmsj.cn"
+    - "wmsjsteam.com"
+    - "dl.steam.clngaa.com"
+    - "dl.steam.ksyna.com"
+    - "st.dl.bscstorage.net"
+    - "st.dl.eccdnx.com"
+    - "st.dl.pinyuncloud.com"
+    - "steampipe.steamcontent.tnkjmec.com"
+    - "steampowered.com.8686c.com"
+    - "steamstatic.com.8686c.com"
+    - "xz.pphimalayanrt.com"
+    - "steampipe-kr.akamaized.net"
+    - "steampipe-partner.akamaized.net"
+    - "steampipe.akamaized.net"
+    - "*.steamcontent.com"
+    - localhost
+    - 127.*
+    - 10.*
+    - 224.*
+    - 239.*
+    - 172.16.*
+    - 172.17.*
+    - 172.18.*
+    - 172.19.*
+    - 172.20.*
+    - 172.21.*
+    - 172.22.*
+    - 172.23.*
+    - 172.24.*
+    - 172.25.*
+    - 172.26.*
+    - 172.27.*
+    - 172.28.*
+    - 172.29.*
+    - 172.30.*
+    - 172.31.*
+    - 192.168.*
+    - <local>
+pacContentText: >-
+  function FindProxyForURL(url, host) {
+    // return "PROXY 127.0.0.1:%mixed-port%; SOCKS5 127.0.0.1:%mixed-port%; DIRECT;"
+    return "SOCKS5 127.0.0.1:%mixed-port%; DIRECT;"
+  }
